@@ -1,5 +1,25 @@
 package nl.jpoint.trojkaracer.car.domain.computervision;
 
+import org.opencv.core.Core;
+import org.opencv.core.Mat;
+import org.opencv.core.MatOfPoint;
+import org.opencv.core.Point;
+import org.opencv.core.Scalar;
+import org.opencv.core.Size;
+import org.opencv.imgcodecs.Imgcodecs;
+import org.opencv.imgproc.Imgproc;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.lang.invoke.MethodHandles;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import static nl.jpoint.trojkaracer.car.domain.computervision.ComputerVisionParameters.BLUR_SIZE;
 import static nl.jpoint.trojkaracer.car.domain.computervision.ComputerVisionParameters.CANNY_APERTURE_SIZE;
 import static nl.jpoint.trojkaracer.car.domain.computervision.ComputerVisionParameters.CANNY_GRADIENT;
@@ -22,25 +42,6 @@ import static nl.jpoint.trojkaracer.car.domain.computervision.ComputerVisionPara
 import static nl.jpoint.trojkaracer.car.domain.computervision.ComputerVisionParameters.ROI_Y_BOTTOM_PERCENTAGE;
 import static nl.jpoint.trojkaracer.car.domain.computervision.ComputerVisionParameters.ROI_Y_MIDDLE_PERCENTAGE;
 import static nl.jpoint.trojkaracer.car.domain.computervision.ComputerVisionParameters.ROI_Y_TOP_PERCENTAGE;
-
-import java.lang.invoke.MethodHandles;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.EnumMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-import org.opencv.core.Core;
-import org.opencv.core.Mat;
-import org.opencv.core.MatOfPoint;
-import org.opencv.core.Point;
-import org.opencv.core.Scalar;
-import org.opencv.core.Size;
-import org.opencv.imgcodecs.Imgcodecs;
-import org.opencv.imgproc.Imgproc;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Helper class that offers several computer vision related operations for converting images (as in {@link Mat} instances), applying masks
@@ -71,7 +72,7 @@ public class ComputerVisionHelper {
         parameters.put(HOUGH_RHO, 2d);
         parameters.put(HOUGH_THETA, Math.PI / 180);
         parameters.put(HOUGH_THRESHOLD, 1);
-        parameters.put(HOUGH_MIN_LINE_LENGTH, 15);
+        parameters.put(HOUGH_MIN_LINE_LENGTH, 8);
         parameters.put(HOUGH_MAX_GAP_SIZE, 5);
 
         parameters.put(DETECT_LINE_SLOPE_MIN, 0.2);
@@ -85,8 +86,8 @@ public class ComputerVisionHelper {
         parameters.put(LANE_LINE_COLOR_LOWER, new Scalar(100, 5, 75));
         parameters.put(LANE_LINE_COLOR_UPPER, new Scalar(180, 30, 250));
 
-        parameters.put(ROI_X_OFFSET_PERCENTAGE, 0.15d);
-        parameters.put(ROI_Y_TOP_PERCENTAGE, 0.50d);
+        parameters.put(ROI_X_OFFSET_PERCENTAGE, 0.0d);
+        parameters.put(ROI_Y_TOP_PERCENTAGE, 0.51d);
         parameters.put(ROI_Y_MIDDLE_PERCENTAGE, 0.85d);
         parameters.put(ROI_Y_BOTTOM_PERCENTAGE, 1d);
     }
@@ -137,7 +138,7 @@ public class ComputerVisionHelper {
 
     public List<Line> filterLines(final List<Line> lines, double lowSlope, double highSlope) {
         return lines.stream()
-                .filter(line -> line.getslope() >= lowSlope && line.getslope() <= highSlope)
+                .filter(line -> line.getSlope() >= lowSlope && line.getSlope() <= highSlope)
                 .collect(Collectors.toList());
     }
 
@@ -376,5 +377,9 @@ public class ComputerVisionHelper {
      */
     public int findAmountOfNonBlackPixels(final Mat image) {
         return Core.countNonZero(image);
+    }
+
+    public Object getParameter(Object key) {
+        return parameters.get(key);
     }
 }
